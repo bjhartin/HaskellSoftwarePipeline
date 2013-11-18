@@ -5,6 +5,26 @@ extensions: {}
 environment: ghc-7.4.2-stable-13.09
 cabal-file: project.cabal
 modules:
+  Requirements:
+    filename: src/Requirements.hs
+  Components:
+    filename: src/Components.hs
+  Repository:
+    filename: src/Repository.hs
+  Environment:
+    filename: src/Environment.hs
+  Peano:
+    filename: src/Peano.hs
+  TestData:
+    filename: src/TestData.hs
+  Release:
+    filename: src/Release.hs
+  User:
+    filename: src/User.hs
+  Pipeline:
+    filename: src/Pipeline.hs
+  Scm:
+    filename: src/Scm.hs
   Main(src/Main.hs):
     filename: src/Main.hs
 version: 1
