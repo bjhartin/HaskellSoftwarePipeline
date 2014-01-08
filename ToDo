@@ -1,0 +1,18 @@
+-- Things TODO
+
+
+-- Create concept of integration component
+---- When deploying an integration component, we deploy its dependencies if not already present
+-- Add concept of Scm file revision
+-- Model 'phase' / state transitions
+-- Deal with requirements that have been reopened
+-- Change how changes are carried by releases/components.  Something is wrong as it is currently
+--   possible to have a release whose 'last change' is not contained by its components' scm root dir.
+---- Is the 'contained by' metaphor too much of a strain?
+-- Can more than one release of a single component exist be deployed in an environment?
+---- Can more than one release of a single component be part of an integration component?
+-- Undeploying
+-- Consider moving 'questions' into the pipeline
+-- Consider type-level programming for further constraint enforcement
+-- Deal with pairing, i.e. multiple users related to a change?
+-- Teams not modeled?

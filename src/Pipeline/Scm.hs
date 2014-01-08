@@ -10,16 +10,16 @@
 --    things vastly simpler.  ScmRootDirs are modeled as
 --    a container for commits.
 --
---    INSIGHT: Commit hook?
 --
 -- 3. A Component corresponds to exactly one ScmRootDir.
-module Scm (ScmRootDir (..),
-            Commit (..),
+module Pipeline.Scm (ScmRootDir (..),
+            Change (..),
             ScmFile,
             Scm (..)) where
 
-    import Requirements
-    import User
+    import Pipeline.Requirements
+    import Pipeline.User
+    import Numeric
 
 
     -- Some aliases for readability
@@ -36,21 +36,27 @@ module Scm (ScmRootDir (..),
     data ScmObjectRevision = ScmObjectRevision ScmFile ScmRevision
 
     -- Root directories, which (logically) contain commits as well as files and dirs.
-    data ScmRootDir = ScmRootDir {scmDirName::String, scmFiles::[ScmFile], scmRootDirCommits::[Commit]} deriving (Show, Eq)
+    data ScmRootDir = ScmRootDir {scmDirName::String, scmFiles::[ScmFile], scmRootDirChanges::[Change]} deriving (Show, Eq)
 
     -- A commit.
-    data Commit = Commit {commitScmRevision::ScmRevision,
-                          commitDescription::ScmDescription,
-                          commitRequirements::[Requirement],
-                          commitAuthor::User,
-                          commitFiles::[ScmFile]} deriving (Show)
+    data Change = Change {changeScmRevision::ScmRevision,
+                          changeDescription::ScmDescription,
+                          changeRequirements::[Requirement],
+                          changeAuthor::User,
+                          changeFiles::[ScmFile]}
 
-    instance Eq Commit where
-        c == d = commitScmRevision c == commitScmRevision d
-    instance Ord Commit where
-        c `compare` d = commitScmRevision c `compare` commitScmRevision d
+    instance Eq Change where
+        c == d = changeScmRevision c == changeScmRevision d
+    instance Ord Change where
+        compare (Change rev1 _ _ _ _) (Change rev2 _ _ _ _) = compare rev1 rev2
+    instance Show Change where
+        show Change {changeScmRevision = rev, changeDescription = desc} = (show rev) ++ ":" ++ desc
 
     data Scm = Scm [ScmRootDir]
+
+    allChanges :: Scm -> [Change]
+    allChanges (Scm rds) = concatMap scmRootDirChanges rds
+
 
 -- TODO
 
@@ -60,7 +66,6 @@ module Scm (ScmRootDir (..),
 -- Files for root dir
 -- Commits for root dir
 -- Commits by user
--- Commits for requirement
 -- Commits for file
 -- Users who modified file
 -- Files modified in commit

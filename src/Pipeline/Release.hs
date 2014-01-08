@@ -6,61 +6,64 @@
 -- 3. Releases are orderable, i.e. we can ask 'Which came first, r1 or r2?'
 -- 4. Releases are mapped to the most recent commit to that component's
 --    SCM dir.
-module Release (Release(..),
-                allDependencies) where
+module Pipeline.Release (Release(..),
+                changes,
+                differences,
+                allDependencies,
+                sameComponent) where
 
-    import Components
-    import Scm
-
+    import Pipeline.Component
+    import Pipeline.Scm
+    import Pipeline.Requirements
+    import Data.List
+    
     type ComponentVersion = String
     data Release = Release {component::Component,
                                           componentVersion::ComponentVersion,
                                           componentDependencies::[Release],
-                                          componentLastCommit::Commit} deriving (Show)
+                                          lastChangeInRelease::Change}
 
--- TESTS / TYPE CONSTRAINTS
---
--- Create a release
--- Compare two releases
+    instance Eq Release where
+        r1 == r2 = component r1 == component r2 && componentVersion r1 == componentVersion r2
+
+    instance Ord Release where
+        r1 <= r2 = component r1 == component r2 && componentVersion r1 <= componentVersion r2
+
+    instance Show Release where
+        show r1 = componentName (component r1) ++ ":" ++ componentVersion r1
+
+    sameComponent::Release -> Release -> Bool
+    sameComponent (Release {component = c1}) (Release {component = c2}) = c1 == c2
 
 -- TODO
---
 -- How to guarantee unique component + version.  This is a tricky problem for a Haskell newbie.
 -- Would love to let the compiler enforce this, but I think this might force
 -- us down the road of modeling the whole things with types and type computations.
 -- That would be fun so I will probably try it at some point.
 --
---
--- DESIRED FUNCTONS
---
--- What questions might we want to ask, or operations might we want to perform,
--- on a release.
---
--- sourceFilesInRelease::Scm -> Release -> [File]
+-- sourceFilesInRelease::Scm -> Release -> [File] -- May need to add concept of revision to ScmFile
 -- contributorsToRelease::Release -> [User]
-
--- deploymentsForRelease::Release -> [Deployment]
-
-    -- deploy:: Release -> Environment -> Deployment
-    -- deploy _ _ = Success -- We rule!
+-- deploymentsForRelease::Pipeline -> Release -> [Deployment]
 
     -- Get all dependencies, including transitive ones
     allDependencies::Release -> [Release]
-    allDependencies c@(Release {componentDependencies = x:xs}) = c : (concatMap allDependencies (x:xs))
-    allDependencies c = [c]
+    allDependencies r@(Release {componentDependencies = x:xs}) =
+        uniqAppend (x:xs)  (concatMap allDependencies (x:xs)) where
+            uniqAppend xs ys = nub (foldr (:) ys xs)
+    allDependencies r = [] -- r has no dependencies
 
-    -- Describe component releases
-    describe::Release -> (String, String)
-    describe cr = (componentName (component cr) , componentVersion cr)
+    changes::Release -> [Change]
+    changes Release {component = Component {componentScmDir = d}, lastChangeInRelease = cm} = filter (<= cm) (scmRootDirChanges d)
+
+    differences::Release -> Release -> [Change]
+    differences r1 r2 = (changes r2) \\ (changes r1)
+
+   
 
     -- Determine if two component releases are for the same component
     --sameComponent::Release -> Release -> Bool
     --sameComponent cr1 cr2 = component cr1 == component cr2
 
-    -- changesInRelease::Component -> ComponentVersion -> ComponentVersion -> [Commit]
-    -- Get the commits between two releases of the same component
-    -- DOES NOT WORK - Will capture commits in between that may not apply to these components.
-    -- HOW to map commits to components?
     --differences::Scm -> Release -> Release -> [Commit]
     --differences (Scm commits) cr1 cr2 | sameComponent cr1 cr2 = filter inRange commits where
     --    inRange c = (c >= componentLastCommit cr1) && (c <= componentLastCommit cr2)
@@ -69,9 +72,6 @@ module Release (Release(..),
     -- Get the requirements addressed in the commits between two releases
     --requirements::Scm -> Release -> Release -> [Requirement]
     --requirements scm cr1 cr2 = concatMap commitRequirements (differences scm cr1 cr2)
-    
-    
 
     --acceptanceTest::ComponentRelease -> Environment -> TestResult -- Test data is a component, deployed by the deployer
     --leadTime::Pipeline -> ComponentRelease -> Phase -> Phase -> Float
-

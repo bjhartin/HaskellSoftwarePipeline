@@ -1,0 +1,11 @@
+INSIGHT/TODO: A release doesn't really contain a requirement, but rather a claim to address a requirement.
+What, exactly, does that mean?  Well, it probably means a claim that the requirement is moved into a
+'fixed/closed' state by the code changes in the release.  However, cannot requirements be reopened?
+So, as we saw at Pearson, this function needs to reconcile against the current state of the requirements
+to 'validate' the claim.
+
+This seems to imply mutability on the requirement, but perhaps not.  Perhaps we model the state
+change itself, i.e. a CompletedRequirement, and search for those.  If a requirement is completed, this
+state change produces a new value to represent the new state, with a reference to the old value.
+
+INSIGHT: branches are new components
