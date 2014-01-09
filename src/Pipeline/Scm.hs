@@ -25,18 +25,16 @@ module Pipeline.Scm (ScmRootDir (..),
     -- Some aliases for readability
     type ScmRevision = Int
     type ScmDescription = String
-
-
-    -- Basic file system representation.
-    -- We take the easy way out here,
-    -- and don't worry about a tree structure.
-    type ScmFile = String
-
-    -- A specific revision of an object.
-    data ScmObjectRevision = ScmObjectRevision ScmFile ScmRevision
+    type ScmFile = String -- A bit oversimplified for now
 
     -- Root directories, which (logically) contain commits as well as files and dirs.
-    data ScmRootDir = ScmRootDir {scmDirName::String, scmFiles::[ScmFile], scmRootDirChanges::[Change]} deriving (Show, Eq)
+    data ScmRootDir = ScmRootDir {scmDirName::String, scmFiles::[ScmFile], scmRootDirChanges::[Change]}
+
+    instance Eq ScmRootDir where
+        d1 == d2 = (scmDirName d1) == (scmDirName d2)
+
+    instance Show ScmRootDir where
+        show d1 = scmDirName d1
 
     -- A commit.
     data Change = Change {changeScmRevision::ScmRevision,
@@ -53,10 +51,6 @@ module Pipeline.Scm (ScmRootDir (..),
         show Change {changeScmRevision = rev, changeDescription = desc} = (show rev) ++ ":" ++ desc
 
     data Scm = Scm [ScmRootDir]
-
-    allChanges :: Scm -> [Change]
-    allChanges (Scm rds) = concatMap scmRootDirChanges rds
-
 
 -- TODO
 

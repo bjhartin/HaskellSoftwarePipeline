@@ -14,11 +14,11 @@ module TestData where
     brian = User "brian" "bhartin@studentloan.org"
 
     -- Set up the requirements
-    defect1 = Requirement "xdefect1" Defect "The login screen is broken."
-    story2 = Requirement "xstory2" UserStory "The user can change their password."
-    story3 = Requirement "xstory3" UserStory "The user can change their email."
-    story4 = Requirement "xstory4" UserStory "The user can place an order."
-    story5 = Requirement "xstory5" UserStory "The user can cancel an order."
+    defect1 = Requirement "defect1" Defect "The login screen is broken."
+    story2 = Requirement "story2" UserStory "The user can change their password."
+    story3 = Requirement "story3" UserStory "The user can change their email."
+    story4 = Requirement "story4" UserStory "The user can place an order."
+    story5 = Requirement "story5" UserStory "The user can cancel an order."
 
 
     -- Set up the SCM system.

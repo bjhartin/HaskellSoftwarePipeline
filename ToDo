@@ -16,3 +16,4 @@
 -- Consider type-level programming for further constraint enforcement
 -- Deal with pairing, i.e. multiple users related to a change?
 -- Teams not modeled?
+-- Requirement description could be split into desired fields

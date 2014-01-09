@@ -1,19 +1,17 @@
-module Pipeline.Requirements (RequirementType (..), 
+module Pipeline.Requirements (RequirementType (..),
                     RequirementId,
                     RequirementDescription,
                     Requirement (..))
 where
 
-    
-
 data RequirementType = UserStory | Defect deriving (Show, Eq)
-type RequirementId = String 
+type RequirementId = String
 type RequirementDescription = String
 data Requirement = Requirement {requirementId::RequirementId,
                                 requirementType::RequirementType,
-                                requirementDescription::RequirementDescription} deriving (Eq)
+                                requirementDescription::RequirementDescription}
 instance Show Requirement where
-        show (Requirement id _ desc) = id
+        show (Requirement id reqType _) = (show reqType) ++ ":" ++ id
 
--- TODO
--- Split description into desired fields.
+instance Eq Requirement where
+        r1 == r2 = (requirementId r1) == (requirementId r2)
